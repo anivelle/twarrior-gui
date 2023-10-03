@@ -45,8 +45,11 @@ QModelIndex ItemModel::index(int row, int column,
   if (!hasIndex(row, column))
     return QModelIndex();
 
+  if (!parent.isValid()){
   QJsonValue *val = new QJsonValue(items->at(row));
   return createIndex(row, column, val);
+  }
+  return QModelIndex();
 }
 
 QModelIndex ItemModel::parent(const QModelIndex &child) const {
@@ -66,7 +69,7 @@ QVariant ItemModel::data(const QModelIndex &index, int role) const {
 
   QJsonValue *val = static_cast<QJsonValue*>(index.internalPointer());
   QJsonObject obj = val->toObject();
-  return val->toObject()["description"].toString();
+  return obj["description"].toString();
 }
 bool ItemModel::setData(const QModelIndex &index, const QVariant &value,
                         int role) { }
