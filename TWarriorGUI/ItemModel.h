@@ -1,9 +1,10 @@
-#ifndef __LIST_H
-#define __LIST_H
+#ifndef __ITEMMODEL_H
+#define __ITEMMODEL_H
 
 #include <QAbstractItemModel>
 #include <QList>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QModelIndex>
 #include <QFile>
@@ -14,18 +15,11 @@ typedef struct task {
 } Task;
 
 class ItemModel : public QAbstractItemModel {
-  private:
-    QJsonDocument tasks;
-    QJsonDocument times;
-
-    QFile *taskFile;
-    QFile *timeFile;
-    QProcess *process;
+  Q_OBJECT 
 
   public:
     ItemModel();
-    ItemModel(QFile *taskData, bool datatype);
-    ItemModel(QFile *taskData, QFile *timeData);
+    explicit ItemModel(QFile *data);
     ~ItemModel();
     void updateData();
     void setProcess(const QString &program);
@@ -48,6 +42,11 @@ class ItemModel : public QAbstractItemModel {
                     const QModelIndex &parent = QModelIndex()) override;
     bool removeRows(int row, int count,
                     const QModelIndex &parent = QModelIndex()) override;
+  private:
+    QJsonArray *items;
+
+    QFile *dataFile;
+    QProcess *process;
 };
 
 #endif

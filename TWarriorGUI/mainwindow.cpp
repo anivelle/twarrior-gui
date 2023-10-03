@@ -20,11 +20,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     QTreeView *tree = ui->treeView;
     taskData = new QJsonDocument();
-    QFile *file = new QFile("~/.twarriorjson");
-    ItemModel *model = new ItemModel(file);
-    model->setProcess("task");
+    QFile file("/home/alex/.twarriorjson");
+    ItemModel *model = new ItemModel(&file);
     model->setArguments({"export", ">", "~/.twarriorjson"});
-    tree->setModel(model);
+     tree->setModel(model);
+
 }
 
 MainWindow::~MainWindow() { delete ui; }
