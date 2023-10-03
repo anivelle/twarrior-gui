@@ -10,9 +10,9 @@
 #include <QFile>
 #include <QProcess>
 
-typedef struct task {
-
-} Task;
+const QString keyMap[] = {
+  "description", "status", "due", "entry", "urgency"
+};
 
 class ItemModel : public QAbstractItemModel {
   Q_OBJECT 

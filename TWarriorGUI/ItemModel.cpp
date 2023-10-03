@@ -46,8 +46,10 @@ QModelIndex ItemModel::index(int row, int column,
     return QModelIndex();
 
   if (!parent.isValid()){
-  QJsonValue *val = new QJsonValue(items->at(row));
-  return createIndex(row, column, val);
+  QJsonValue val = items->at(row);
+  QJsonObject obj = val.toObject();
+  QJsonValue *ret = new QJsonValue(obj[keyMap[column]]);
+  return createIndex(row, column, ret);
   }
   return QModelIndex();
 }
@@ -55,11 +57,13 @@ QModelIndex ItemModel::index(int row, int column,
 QModelIndex ItemModel::parent(const QModelIndex &child) const {
   return QModelIndex();
 }
+
 int ItemModel::rowCount(const QModelIndex &parent) const {
   return items->size();
 }
+
 int ItemModel::columnCount(const QModelIndex &parent) const {
-  return 1;
+  return 5;
 }
 QVariant ItemModel::data(const QModelIndex &index, int role) const {
   if (!index.isValid())
@@ -68,37 +72,45 @@ QVariant ItemModel::data(const QModelIndex &index, int role) const {
     return QVariant();
 
   QJsonValue *val = static_cast<QJsonValue*>(index.internalPointer());
-  QJsonObject obj = val->toObject();
-  return obj["description"].toString();
+  return val->toVariant();
 }
+
 bool ItemModel::setData(const QModelIndex &index, const QVariant &value,
                         int role) { }
+
 Qt::ItemFlags ItemModel::flags(const QModelIndex &index) const {
   if (!index.isValid())
     return Qt::NoItemFlags;
 
   return QAbstractItemModel::flags(index);
 }
+
 QVariant ItemModel::headerData(int section, Qt::Orientation orientation,
                                int role) const {
-  QJsonValue item = items->first();
-  QJsonObject arr = item.toObject();
-  QJsonValue item2 = arr["description"];
-  QJsonObject obj = item2.toObject();
-  QStringList keys = obj.keys();
+  // QJsonValue item = items->first();
+  // QJsonObject arr = item.toObject();
+  // QJsonValue item2 = arr["description"];
+  // QJsonObject obj = item2.toObject();
+  // QStringList keys = obj.keys();
 
-  if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-    return "Temp";
+  if (orientation == Qt::Horizontal && role == Qt::DisplayRole){
+    QString header = keyMap[section];
+    header[0] = header[0].toUpper();
+    return header;
+  }
 
   return QVariant();
 
 }
+
 bool ItemModel::setHeaderData(int section, Qt::Orientation orientation,
                               const QVariant &value, int role) {}
+
 bool ItemModel::insertRows(int row, int count, const QModelIndex &parent) {
   beginInsertRows(parent, row, row + count - 1);
   
   endInsertRows();
   return true;
 }
+
 bool ItemModel::removeRows(int row, int count, const QModelIndex &parent) {}
