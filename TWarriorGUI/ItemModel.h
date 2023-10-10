@@ -10,18 +10,17 @@
 #include <QFile>
 #include <QProcess>
 
-const QString keyMap[] = {
-  "description", "status", "due", "entry", "urgency"
-};
+const QString keyMap[] = {"id", "description", "status", "due", "entry", "urgency"};
 
 class ItemModel : public QAbstractItemModel {
-  Q_OBJECT 
+    Q_OBJECT
+
+  private slots:
+    void updateData();
 
   public:
-    ItemModel();
-    explicit ItemModel(QFile *data);
+    ItemModel(bool taskwarrior);
     ~ItemModel();
-    void updateData();
     void setProcess(const QString &program);
     void setArguments(const QStringList &arguments);
     QModelIndex index(int row, int column,
@@ -42,9 +41,11 @@ class ItemModel : public QAbstractItemModel {
                     const QModelIndex &parent = QModelIndex()) override;
     bool removeRows(int row, int count,
                     const QModelIndex &parent = QModelIndex()) override;
+    void toggleShowCompleted();
+
   private:
     QJsonArray *items;
-
+    bool showCompleted;
     QFile *dataFile;
     QProcess *process;
 };
