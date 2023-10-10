@@ -1,10 +1,10 @@
 #include "ItemModel.h"
 #include <iostream>
 #include <QDateTime>
+#include <QDir>
 
 void ItemModel::updateData() {
     QByteArray arr = process->readAllStandardOutput();
-    // std::cout << arr.toStdString();
     QJsonDocument doc = QJsonDocument::fromJson(arr);
     *items = doc.array();
     dataFile->open(QIODevice::WriteOnly);
@@ -19,10 +19,10 @@ ItemModel::ItemModel(bool taskwarrior) {
     showCompleted = false;
     if (taskwarrior) {
         setProcess("task");
-        dataFile = new QFile("~/.taskwarrior");
+        dataFile = new QFile(QDir::homePath() + "/.taskwarrior");
     } else {
         setProcess("timew");
-        dataFile = new QFile("~/.timewarrior");
+        dataFile = new QFile(QDir::homePath() + "/.timewarrior");
     }
     setArguments(QStringList("export"));
     connect(process, &QProcess::readyReadStandardOutput, this,
