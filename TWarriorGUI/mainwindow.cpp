@@ -6,25 +6,25 @@
 #include <QProcess>
 #include <QByteArray>
 #include <QFile>
-
-QJsonDocument *taskData;
-
-void readJson() {
-    QByteArray jsonData;
-
-    *taskData = QJsonDocument::fromJson(jsonData);
-}
+#include <QtDBus/QtDBus>
+#include <QTextStream>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     QTreeView *tree = ui->treeView;
-    taskData = new QJsonDocument();
-    // QFile file("/home/alex/.twarriorjson");
     ItemModel *model = new ItemModel(true);
-    //model->setArguments({"export", ">", "~/.twarriorjson"});
     tree->setModel(model);
-
+    QDBusInterface notify("org.freedesktop.Notifications",
+                          "/org/freedesktop/Notifications",
+                          "org.freedesktop.Notifications");
+    QTextStream(stdout) << notify.isValid();
+    QDBusReply<QList<QString>> reply = notify.call("GetCapabilities");
+    QList<QString> arr;
+    QList<QString> arr2;
+    QDBusReply<unsigned int> r = notify.call("Notify", "twarrior", 0, "", "summary", "body", arr, arr2, -1);
+    qDebug() << notify.lastError();
+    qDebug() << r.value();
 }
 
 MainWindow::~MainWindow() { delete ui; }
