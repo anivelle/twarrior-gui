@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QtDBus/QtDBus>
 #include <QTextStream>
+#include <QVariantList>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -20,9 +21,17 @@ MainWindow::MainWindow(QWidget *parent)
                           "org.freedesktop.Notifications");
     QTextStream(stdout) << notify.isValid();
     QDBusReply<QList<QString>> reply = notify.call("GetCapabilities");
-    QList<QString> arr;
-    QList<QString> arr2;
-    QDBusReply<unsigned int> r = notify.call("Notify", "twarrior", 0, "", "summary", "body", arr, arr2, -1);
+    // QDBusArgument *args = new QDBusArgument();
+    QString name = "twarrior";
+    unsigned int notif = 0;
+    QString icon = "";
+    QString summary = "summary";
+    QString body = "body";
+    QList<QString> actions;
+    QMap<QString, QVariant> hints;
+    int timeout = -1;
+    QList<QVariant> args = {name, notif, icon, summary, body, actions, actions, timeout};
+    QDBusReply<unsigned int> r = notify.call("Notify", name, notif, icon, summary, body, actions, hints, timeout);
     qDebug() << notify.lastError();
     qDebug() << r.value();
 }
