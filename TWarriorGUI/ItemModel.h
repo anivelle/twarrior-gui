@@ -13,7 +13,7 @@
 const QString keyMap[] = {"id", "description", "status", "due", "entry", "urgency"};
 
 class ItemModel : public QAbstractItemModel {
-    Q_OBJECT
+    Q_OBJECT;
 
   private slots:
     void updateData();
