@@ -3,36 +3,33 @@
 #include <QObject>
 #include <QtDBus/QtDBus>
 
-typedef struct Notification {
-    QString processName;
-    unsigned int id;
-    QString icon;
-    QString summary;
-    QString body;
-    QList<QString> actions;
-    QMap<QString, QVariant> hints;
-    int timeout;
-    void (*callback)(unsigned int, QString);
-} Notification_t;
+typedef QList<QVariant> NotificationArgs;
 
-class NotificationHandler {
-  Q_OBJECT;
+class Notification : QObject {
+    Q_OBJECT;
 
   private:
-    QList<Notification> *notifs;
+    NotificationArgs args;
+    void (*callback)(unsigned int, QString);
     QDBusInterface *interface;
 
   public:
-    NotificationHandler();
-    ~NotificationHandler();
-    bool Start();
-    bool Close();
-    int AddNotification(Notification notif);
-    int AddNotification(QString processName, unsigned int id, QString icon,
-                         QString summary, QString body, QList<QString> actions,
-                         QMap<QString, QVariant> hints, int timeout, void (*callback)(unsigned int, QString));
-    bool SendNotification();
-    bool SendNotification(int num);
+    Notification(QDBusInterface &iface);
+    Notification(QDBusInterface &iface, NotificationArgs notif,
+                 void (*callback)(unsigned int, QString) = NULL);
+    Notification(QDBusInterface &iface, QString processName, unsigned int id,
+                 QString icon, QString summary, QString body,
+                 QList<QString> actions, QMap<QString, QVariant> hints,
+                 int timeout = -1,
+                 void (*callback)(unsigned int, QString) = NULL);
+    ~Notification();
+    bool Ready();
+
+    int Send();
+    int Send(QString processName, unsigned int id, QString icon,
+             QString summary, QString body, QList<QString> actions,
+             QMap<QString, QVariant> hints, int timeout,
+             void (*callback)(unsigned int, QString) = NULL);
 };
 
 #endif

@@ -59,7 +59,9 @@ QModelIndex ItemModel::index(int row, int column,
     QJsonObject obj = val.toObject();
     QJsonValue *ret = new QJsonValue(obj[keyMap[column]]);
     if (!showCompleted && obj["id"].toInt() == 0)
-        return QModelIndex();
+      return QModelIndex();
+    if (!QString("recurring").compare(obj["status"].toString())) 
+      return QModelIndex();
 
     return createIndex(row, column, ret);
 }
@@ -72,7 +74,7 @@ int ItemModel::rowCount(const QModelIndex &parent) const {
     return items->size();
 }
 
-int ItemModel::columnCount(const QModelIndex &parent) const { return 6; }
+int ItemModel::columnCount(const QModelIndex &parent) const { return sizeof(keyMap) / sizeof(QString); }
 
 QVariant ItemModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid())
@@ -92,7 +94,16 @@ QVariant ItemModel::data(const QModelIndex &index, int role) const {
 }
 
 bool ItemModel::setData(const QModelIndex &index, const QVariant &value,
-                        int role) {}
+                        int role) {
+  if (!index.isValid())
+    return false;
+
+  QJsonValue *val = static_cast<QJsonValue *>(index.internalPointer());
+  QJsonValue newVal = QJsonValue::fromVariant(value);
+  val->swap(newVal);
+
+  return true;
+}
 
 Qt::ItemFlags ItemModel::flags(const QModelIndex &index) const {
     if (!index.isValid())

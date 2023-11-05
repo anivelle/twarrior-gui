@@ -10,11 +10,13 @@ CONFIG += c++17
 
 SOURCES += \
     ItemModel.cpp \
+    Notifications.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     ItemModel.h \
+    Notifications.h \
     mainwindow.h
 
 FORMS += \
